@@ -1,0 +1,146 @@
+.server-form {
+    background: var(--color-background);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: var(--spacing-lg);
+    max-width: 560px;
+}
+
+.server-form h3 {
+    margin-bottom: var(--spacing-lg);
+    font-size: 1.1rem;
+}
+
+/* ── Section labels ──────────────────────────────────── */
+.form-section-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--color-text-muted);
+    margin: var(--spacing-lg) 0 var(--spacing-sm);
+    padding-bottom: var(--spacing-sm);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.form-section-label:first-of-type {
+    margin-top: 0;
+}
+
+/* ── Field ───────────────────────────────────────────── */
+.form-field {
+    margin-bottom: var(--spacing-md);
+}
+
+.form-field label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--color-text);
+    margin-bottom: var(--spacing-sm);
+}
+
+.form-field input,
+.form-field select,
+.form-field textarea {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    font-size: 0.95rem;
+    font-family: inherit;
+    background: var(--color-background);
+    transition: border-color 0.15s;
+}
+
+.form-field textarea {
+    resize: vertical;
+}
+
+.form-field input:focus,
+.form-field select:focus,
+.form-field textarea:focus {
+    outline: none;
+    border-color: var(--color-primary);
+}
+
+.form-hint {
+    display: block;
+    font-size: 0.78rem;
+    color: var(--color-text-muted);
+    margin-top: 3px;
+}
+
+/* ── Row layout (host + port side by side) ───────────── */
+.form-row {
+    display: flex;
+    gap: var(--spacing-md);
+}
+
+.form-field-grow {
+    flex: 1;
+}
+
+.form-field-small {
+    width: 110px;
+    flex-shrink: 0;
+}
+
+/* ── Checkbox ────────────────────────────────────────── */
+.form-field-checkbox label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    cursor: pointer;
+}
+
+.form-field-checkbox input[type="checkbox"] {
+    width: auto;
+    accent-color: var(--color-primary);
+}
+
+/* ── Submit button ───────────────────────────────────── */
+.submit-button {
+    background: var(--color-primary);
+    color: white;
+    border: none;
+    padding: 0.6rem 1.25rem;
+    border-radius: var(--radius);
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s;
+    margin-top: var(--spacing-sm);
+}
+
+.submit-button:hover:not(:disabled) {
+    background: var(--color-primary-dark);
+}
+
+.submit-button:disabled {
+    background: var(--color-text-muted);
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+/* ── Feedback ────────────────────────────────────────── */
+.form-error {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #991b1b;
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-radius: var(--radius);
+    margin-bottom: var(--spacing-md);
+    font-size: 0.9rem;
+}
+
+.form-success {
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    color: #166534;
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-radius: var(--radius);
+    margin-bottom: var(--spacing-md);
+    font-size: 0.9rem;
+}
