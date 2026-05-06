@@ -1,8 +1,8 @@
 /**
  * Database service — fetches live data from the backend API.
  *
- * Each "table" corresponds to a real backend endpoint + SQLAlchemy model.
- * The column definitions mirror the backend Pydantic response schemas.
+ * Table definitions mirror the actual backend SQLAlchemy models and
+ * Pydantic response schemas exactly.
  */
 import { api } from './apiService';
 
@@ -15,211 +15,281 @@ export interface DatabaseTable {
   name: string;
   description: string;
   columns: TableColumn[];
-  endpoint: string;                       // backend GET path
+  endpoint: string;
   rows: Record<string, unknown>[];
 }
 
-// ── Table metadata matching backend models ───────────────────────────────
+// ── Table metadata matching actual backend models ────────────────────────────
 
 export const tableDefinitions: Omit<DatabaseTable, 'rows'>[] = [
   {
     name: 'server',
-    description: 'Serveurs CFT inventoriés (CFTPARM)',
+    description: 'Serveurs CFT inventoriés — un enregistrement par instance CFTUTIL exportée.',
     endpoint: '/api/v1/servers',
     columns: [
-      { name: 'id', type: 'int' },
-      { name: 'name', type: 'string' },
-      { name: 'ip_address', type: 'string' },
-      { name: 'environment', type: 'string' },
-      { name: 'install_path', type: 'string' },
-      { name: 'os_info', type: 'string' },
+      { name: 'id',              type: 'int' },
+      { name: 'name',            type: 'string' },
+      { name: 'ip_address',      type: 'string' },
+      { name: 'environment',     type: 'string' },
+      { name: 'install_path',    type: 'string' },
+      { name: 'os_info',         type: 'string' },
       { name: 'raw_export_date', type: 'datetime' },
-      { name: 'comment', type: 'text' },
-      { name: 'created_at', type: 'datetime' },
+      { name: 'comment',         type: 'text' },
+      { name: 'created_at',      type: 'datetime' },
+      { name: 'updated_at',      type: 'datetime' },
     ],
   },
   {
-    name: 'cft_partner',
-    description: 'Partenaires CFT (CFTPART)',
-    endpoint: '/api/v1/cft-partners',
+    name: 'partner',
+    description: 'Partenaires CFT (CFTPART) — enrichis avec l\'activité Copilot.',
+    endpoint: '/api/v1/partners',
     columns: [
-      { name: 'id', type: 'string' },
-      { name: 'nspart', type: 'string' },
-      { name: 'nrpart', type: 'string' },
-      { name: 'ssl', type: 'boolean' },
-      { name: 'sap', type: 'string' },
-      { name: 'nspassw', type: 'string' },
-      { name: 'nrpassw', type: 'string' },
+      { name: 'id',                  type: 'int' },
+      { name: 'server_id',           type: 'int' },
+      { name: 'name',                type: 'string' },
+      { name: 'nrpart',              type: 'string' },
+      { name: 'nspart',              type: 'string' },
+      { name: 'prot',                type: 'string' },
+      { name: 'sap',                 type: 'string' },
+      { name: 'state',               type: 'string' },
+      { name: 'commut',              type: 'string' },
+      { name: 'idf_list',            type: 'text' },
+      { name: 'cfttcp_name',         type: 'string' },
+      { name: 'cfttcp_id',           type: 'int' },
+      { name: 'is_active',           type: 'boolean' },
+      { name: 'activity_status',     type: 'string' },
+      { name: 'transfer_count_12m',  type: 'int' },
+      { name: 'avg_daily_volume',    type: 'float' },
+      { name: 'last_transfer_date',  type: 'datetime' },
+      { name: 'comment',             type: 'text' },
     ],
   },
   {
-    name: 'cft_flow',
-    description: 'Flux CFT (CFTSEND / CFTRECV)',
-    endpoint: '/api/v1/cft-flows',
+    name: 'flow',
+    description: 'Flux de transfert CFT (CFTSEND / CFTRECV) — un enregistrement par IDF × partenaire × direction.',
+    endpoint: '/api/v1/flows',
     columns: [
-      { name: 'idf_code', type: 'string' },
-      { name: 'direct', type: 'string' },
-      { name: 'fcode', type: 'string' },
-      { name: 'ftype', type: 'string' },
-      { name: 'flrecl', type: 'string' },
-      { name: 'frecfm', type: 'string' },
-      { name: 'fname', type: 'string' },
-      { name: 'xlate', type: 'boolean' },
+      { name: 'id',                  type: 'int' },
+      { name: 'partner_id',          type: 'int' },
+      { name: 'server_id',           type: 'int' },
+      { name: 'idf',                 type: 'string' },
+      { name: 'cft_type',            type: 'string' },
+      { name: 'ftype',               type: 'string' },
+      { name: 'fcode',               type: 'string' },
+      { name: 'fname',               type: 'string' },
+      { name: 'wfname',              type: 'string' },
+      { name: 'nfname',              type: 'string' },
+      { name: 'exec',                type: 'string' },
+      { name: 'partner_list',        type: 'text' },
+      { name: 'is_active',           type: 'boolean' },
+      { name: 'activity_status',     type: 'string' },
+      { name: 'transfer_count_12m',  type: 'int' },
+      { name: 'avg_daily_volume',    type: 'float' },
+      { name: 'last_transfer_date',  type: 'datetime' },
+      { name: 'comment',             type: 'text' },
     ],
   },
   {
-    name: 'cft_tcp',
-    description: 'Configuration réseau TCP par partenaire (CFTTCP)',
-    endpoint: '/api/v1/cft-tcp',
+    name: 'cfttcp',
+    description: 'Configuration réseau TCP (CFTTCP) — paramètres de connexion par partenaire.',
+    endpoint: 'server-scoped:/api/v1/servers/{id}/cfttcp',
     columns: [
-      { name: 'partner_id', type: 'string' },
-      { name: 'cnxout', type: 'string' },
-      { name: 'host', type: 'string' },
+      { name: 'id',          type: 'int' },
+      { name: 'server_id',   type: 'int' },
+      { name: 'name',        type: 'string' },
+      { name: 'host',        type: 'string' },
+      { name: 'port',        type: 'int' },
+      { name: 'cnx_in',     type: 'int' },
+      { name: 'cnx_out',    type: 'int' },
+      { name: 'cnx_inout',  type: 'int' },
+      { name: 'retry_wait', type: 'int' },
+      { name: 'retry_max',  type: 'int' },
+      { name: 'ssl_id',     type: 'string' },
+      { name: 'comment',    type: 'text' },
     ],
   },
   {
-    name: 'transfer',
-    description: 'Transferts CFT (lien partenaire ↔ flux)',
-    endpoint: '/api/v1/transfers',
+    name: 'cftprot',
+    description: 'Protocoles CFT (CFTPROT) — définition PeSIT et autres protocoles.',
+    endpoint: 'server-scoped:/api/v1/servers/{id}/cftprot',
     columns: [
-      { name: 'id', type: 'int' },
-      { name: 'partner_id', type: 'string' },
-      { name: 'idf_id', type: 'string' },
-      { name: 'date', type: 'datetime' },
-      { name: 'nbre_ligne', type: 'int' },
-      { name: 'direct', type: 'string' },
-      { name: 'is_migrable', type: 'boolean' },
+      { name: 'id',        type: 'int' },
+      { name: 'server_id', type: 'int' },
+      { name: 'name',      type: 'string' },
+      { name: 'prot_type', type: 'string' },
+      { name: 'net',       type: 'string' },
+      { name: 'sap',       type: 'string' },
+      { name: 'ssl_id',    type: 'string' },
+      { name: 'compress',  type: 'string' },
+      { name: 'restart',   type: 'string' },
+      { name: 'concat',    type: 'string' },
+      { name: 'comment',   type: 'text' },
     ],
   },
   {
-    name: 'flow_action',
-    description: 'Actions associées aux transferts (lien vers scripts)',
-    endpoint: '/api/v1/flow-actions',
+    name: 'cftssl',
+    description: 'Configuration SSL/TLS (CFTSSL) — certificats et chiffrements.',
+    endpoint: 'server-scoped:/api/v1/servers/{id}/cftssl',
     columns: [
-      { name: 'id', type: 'int' },
-      { name: 'transfer_id', type: 'int' },
-      { name: 'script_id', type: 'int' },
+      { name: 'id',        type: 'int' },
+      { name: 'server_id', type: 'int' },
+      { name: 'name',      type: 'string' },
+      { name: 'direct',    type: 'string' },
+      { name: 'rootcid',   type: 'string' },
+      { name: 'usercid',   type: 'string' },
+      { name: 'userkey',   type: 'string' },
+      { name: 'version',   type: 'string' },
+      { name: 'verify',    type: 'string' },
+      { name: 'ciphlist',  type: 'string' },
     ],
   },
   {
-    name: 'post_processing_scripts',
-    description: 'Scripts de post-traitement',
-    endpoint: '/api/v1/post-processing-scripts',
+    name: 'processing',
+    description: 'Scripts de sortie CFT (EXITEOT / EXITBOT / EXITDIR / EXITFILE) — classifiés A/B/C.',
+    endpoint: 'server-scoped:/api/v1/servers/{id}/processing',
     columns: [
-      { name: 'id', type: 'int' },
-      { name: 'script_path', type: 'string' },
-      { name: 'script_type', type: 'string' },
+      { name: 'id',                     type: 'int' },
+      { name: 'server_id',              type: 'int' },
+      { name: 'flow_id',                type: 'int' },
+      { name: 'script_path',            type: 'string' },
+      { name: 'script_type',            type: 'string' },
+      { name: 'bucket',                 type: 'string' },
+      { name: 'classification_notes',   type: 'text' },
+      { name: 'migration_action',       type: 'text' },
+      { name: 'calls_unknown_scripts',  type: 'boolean' },
+      { name: 'unknown_script_paths',   type: 'text' },
+      { name: 'branch_condition',       type: 'text' },
+      { name: 'branch_action',          type: 'text' },
+      { name: 'branch_has_unknown_call', type: 'boolean' },
     ],
   },
   {
-    name: 'moncft_config',
-    description: 'Configuration MonCFT (monitoring)',
-    endpoint: '/api/v1/moncft-configs',
+    name: 'bosco_route',
+    description: 'Routes Bosco (BOSCO_SEND / BOSCO_RECV) — configuration du routeur de fichiers interne.',
+    endpoint: 'server-scoped:/api/v1/servers/{id}/bosco-routes',
     columns: [
-      { name: 'id', type: 'int' },
-      { name: 'fname', type: 'string' },
-      { name: 'filtre', type: 'string' },
-      { name: 'parm', type: 'string' },
-      { name: 'nfname', type: 'string' },
-      { name: 'transfer_id', type: 'int' },
-      { name: 'SAPPL', type: 'string' },
-      { name: 'RAPPL', type: 'string' },
-      { name: 'SUSER', type: 'string' },
+      { name: 'id',              type: 'int' },
+      { name: 'server_id',       type: 'int' },
+      { name: 'section_name',    type: 'string' },
+      { name: 'route_type',      type: 'string' },
+      { name: 'active',          type: 'boolean' },
+      { name: 'local_dir',       type: 'string' },
+      { name: 'backup_dir',      type: 'string' },
+      { name: 'dest_dir',        type: 'string' },
+      { name: 'archive_dir',     type: 'string' },
+      { name: 'remote_address',  type: 'string' },
+      { name: 'remote_port',     type: 'int' },
+      { name: 'remote_subdir',   type: 'string' },
+      { name: 'file_mask',       type: 'string' },
+      { name: 'protocol',        type: 'string' },
+      { name: 'partner_ref',     type: 'string' },
+      { name: 'idf_ref',         type: 'string' },
+      { name: 'schedule',        type: 'string' },
+      { name: 'processing_app',  type: 'string' },
+      { name: 'comment',         type: 'text' },
     ],
   },
   {
-    name: 'boscosend_config',
-    description: 'Configuration BoscoSend',
-    endpoint: '/api/v1/boscosend-configs',
+    name: 'copilot_activity',
+    description: 'Activité Copilot — historique 12 mois pour distinguer flux actifs et dormants.',
+    endpoint: '/api/v1/copilot-activities',
     columns: [
-      { name: 'id', type: 'int' },
-      { name: 'remote_address', type: 'string' },
-      { name: 'remote_subdir', type: 'string' },
-      { name: 'transfer_id', type: 'int' },
-      { name: 'localdir', type: 'string' },
+      { name: 'id',                    type: 'int' },
+      { name: 'server_name',           type: 'string' },
+      { name: 'partner_id_ref',        type: 'string' },
+      { name: 'idf',                   type: 'string' },
+      { name: 'direction',             type: 'string' },
+      { name: 'last_transfer_date',    type: 'datetime' },
+      { name: 'transfer_count_12m',    type: 'int' },
+      { name: 'avg_daily_volume',      type: 'float' },
+      { name: 'status_recommendation', type: 'string' },
     ],
   },
   {
-    name: 'cft_tcp_without_partner',
-    description: 'TCP entries sans partenaire associé (staging)',
-    endpoint: '/api/v1/stg-cft-tcp-without-partner',
+    name: 'migration',
+    description: 'Suivi de migration — un enregistrement par flux actif, avec statut et complexité.',
+    endpoint: '/api/v1/migrations',
     columns: [
-      { name: 'id', type: 'string' },
-      { name: 'cnxout', type: 'string' },
-      { name: 'host', type: 'string' },
-      { name: 'reason', type: 'string' },
+      { name: 'id',              type: 'int' },
+      { name: 'flow_id',         type: 'int' },
+      { name: 'status',          type: 'string' },
+      { name: 'complexity',      type: 'string' },
+      { name: 'assigned_to',     type: 'string' },
+      { name: 'exception_notes', type: 'text' },
+      { name: 'started_at',      type: 'datetime' },
+      { name: 'completed_at',    type: 'datetime' },
+      { name: 'last_updated',    type: 'datetime' },
     ],
   },
   {
     name: 'remote_server',
-    description: 'Profils de connexion serveurs distants (SSH)',
+    description: 'Profils de connexion SSH vers les serveurs CFT distants.',
     endpoint: '/api/v1/remote-servers',
     columns: [
-      { name: 'id', type: 'int' },
-      { name: 'name', type: 'string' },
-      { name: 'remote_host', type: 'string' },
-      { name: 'remote_port', type: 'int' },
-      { name: 'remote_user', type: 'string' },
-      { name: 'remote_data_dir', type: 'string' },
-      { name: 'local_dest', type: 'string' },
-      { name: 'auth_method', type: 'string' },
-      { name: 'environment', type: 'string' },
-      { name: 'is_active', type: 'boolean' },
-      { name: 'last_pull_at', type: 'datetime' },
+      { name: 'id',               type: 'int' },
+      { name: 'name',             type: 'string' },
+      { name: 'remote_host',      type: 'string' },
+      { name: 'remote_port',      type: 'int' },
+      { name: 'remote_user',      type: 'string' },
+      { name: 'remote_data_dir',  type: 'string' },
+      { name: 'local_dest',       type: 'string' },
+      { name: 'auth_method',      type: 'string' },
+      { name: 'environment',      type: 'string' },
+      { name: 'is_active',        type: 'boolean' },
+      { name: 'last_pull_at',     type: 'datetime' },
       { name: 'last_pull_status', type: 'string' },
+      { name: 'description',      type: 'text' },
     ],
   },
 ];
 
-// ── Fetch helpers ────────────────────────────────────────────────────────
+// ── Routing helpers ──────────────────────────────────────────────────────────
+
+const SERVER_SCOPED_ENDPOINTS: Record<string, (serverId: number) => string> = {
+  cfttcp:       (id) => `/api/v1/servers/${id}/cfttcp`,
+  cftprot:      (id) => `/api/v1/servers/${id}/cftprot`,
+  cftssl:       (id) => `/api/v1/servers/${id}/cftssl`,
+  processing:   (id) => `/api/v1/servers/${id}/processing`,
+  bosco_route:  (id) => `/api/v1/servers/${id}/bosco-routes`,
+};
+
+const GLOBAL_ENDPOINTS: Record<string, string> = {
+  server:            '/api/v1/servers?page_size=100',
+  partner:           '/api/v1/partners?page_size=200',
+  flow:              '/api/v1/flows?page_size=200',
+  copilot_activity:  '/api/v1/copilot-activities?page_size=200',
+  migration:         '/api/v1/migrations?page_size=200',
+  remote_server:     '/api/v1/remote-servers?page_size=100',
+};
+
+// ── Public fetch function ────────────────────────────────────────────────────
 
 /**
- * Fetch rows for a table from the backend.
- * For server-scoped tables we aggregate across all known servers.
+ * Fetch rows for a named table. Server-scoped tables aggregate across all servers.
  */
 export async function fetchTableRows(
     tableName: string,
     servers: { id: number }[] = [],
 ): Promise<Record<string, unknown>[]> {
-  const def = tableDefinitions.find((t) => t.name === tableName);
-  if (!def) return [];
-
-  // Tables that need per-server fetching
-  const serverScopedTables: Record<string, (serverId: number) => string> = {
-    cfttcp: (id) => `/api/v1/servers/${id}/cfttcp`,
-    cftprot: (id) => `/api/v1/servers/${id}/cftprot`,
-    cftssl: (id) => `/api/v1/servers/${id}/cftssl`,
-    processing: (id) => `/api/v1/servers/${id}/processing`,
-    bosco_route: (id) => `/api/v1/servers/${id}/bosco-routes`,
-  };
-
-  if (serverScopedTables[tableName]) {
-    const builder = serverScopedTables[tableName];
+  // Server-scoped: aggregate one request per known server
+  const scopedBuilder = SERVER_SCOPED_ENDPOINTS[tableName];
+  if (scopedBuilder) {
     const allRows: Record<string, unknown>[] = [];
     for (const srv of servers) {
       try {
         const rows = await api.get<Record<string, unknown>[]>(
-            `${builder(srv.id)}?page_size=200`,
+            `${scopedBuilder(srv.id)}?page_size=200`,
         );
         allRows.push(...rows);
       } catch {
-        // server may not have this data — skip
+        // server may have no data for this table — skip silently
       }
     }
     return allRows;
   }
 
-  // Global endpoints — respect each controller's page_size limit
-  const globalEndpoints: Record<string, string> = {
-    server: '/api/v1/servers?page_size=100',
-    partner: '/api/v1/partners?page_size=200',
-    flow: '/api/v1/flows?page_size=200',
-    copilot_activity: '/api/v1/copilot-activities?page_size=200',
-    migration: '/api/v1/migrations?page_size=200',
-    remote_server: '/api/v1/remote-servers?page_size=100',
-  };
-
-  const endpoint = globalEndpoints[tableName];
+  // Global endpoint
+  const endpoint = GLOBAL_ENDPOINTS[tableName];
   if (!endpoint) return [];
 
   try {
@@ -229,8 +299,10 @@ export async function fetchTableRows(
   }
 }
 
+// ── Service object ────────────────────────────────────────────────────────────
+
 export const databaseService = {
-  async listTables(): Promise<DatabaseTable[]> {
+  listTables(): DatabaseTable[] {
     return tableDefinitions.map((def) => ({ ...def, rows: [] }));
   },
 
