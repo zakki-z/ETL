@@ -12,9 +12,9 @@ from fastapi import APIRouter, Depends, Query
 from sqlalchemy.engine import Connection
 from sqlalchemy import select
 
-from db.database import get_db
-from models.copilot_activity import copilot_activity_table
-from schemas import CopilotActivityResponse
+from commons.db.database import get_db
+from inventory.models.copilot_activity import copilot_activity_table
+from inventory.schemas import CopilotActivityResponse
 
 router = APIRouter(prefix="/api/v1/copilot-activities", tags=["Copilot Activity"])
 

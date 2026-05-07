@@ -12,9 +12,9 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.engine import Connection
 from sqlalchemy import select
 
-from db.database import get_db
-from models.processing import processing_table
-from schemas import ProcessingResponse
+from commons.db.database import get_db
+from inventory.models.processing import processing_table
+from inventory.schemas import ProcessingResponse
 
 router = APIRouter(prefix="/api/v1", tags=["Processing (Exit Scripts)"])
 

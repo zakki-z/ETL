@@ -12,11 +12,11 @@ from typing import List, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.engine import Connection
-from sqlalchemy import select, func, text
+from sqlalchemy import select, text
 
-from db.database import get_db
-from models.migration import migration_table
-from schemas import MigrationResponse, MigrationUpdate
+from commons.db.database import get_db
+from inventory.models.migration import migration_table
+from inventory.schemas import MigrationResponse, MigrationUpdate
 
 router = APIRouter(prefix="/api/v1/migrations", tags=["Migrations"])
 

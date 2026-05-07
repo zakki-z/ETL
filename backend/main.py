@@ -12,12 +12,11 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
-from db.database import engine
-from controllers import all_routers
+from commons.db.database import engine
+from inventory.controllers import all_routers
 
 # Import models to ensure all tables are registered on the shared metadata
-import models
-from services.database_operations import create_schema
+from inventory.services.database_operations import create_schema
 
 logging.basicConfig(
     level=logging.INFO,

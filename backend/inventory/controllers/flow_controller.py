@@ -13,9 +13,9 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.engine import Connection
 from sqlalchemy import select
 
-from db.database import get_db
-from models.flow import flow_table
-from schemas import FlowResponse
+from commons.db.database import get_db
+from inventory.models.flow import flow_table
+from inventory.schemas import FlowResponse
 
 router = APIRouter(prefix="/api/v1", tags=["Flows"])
 

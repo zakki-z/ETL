@@ -10,11 +10,11 @@ from typing import List, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.engine import Connection
-from sqlalchemy import func, select
+from sqlalchemy import select
 
-from db.database import get_db
-from models.server import server_table
-from schemas import (
+from commons.db.database import get_db
+from inventory.models.server import server_table
+from inventory.schemas import (
     ServerCreate,
     ServerUpdate,
     ServerResponse,

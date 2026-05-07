@@ -5,23 +5,22 @@ Discovers server directories, parses CFT configs / exit scripts /
 Bosco routes / Copilot CSVs, and loads everything into the database.
 """
 
-import logging
+from inventory.services import logging
 import re
-import sys
 from pathlib import Path
 
 from sqlalchemy import create_engine, text
 
-from models import (
+from inventory.models import (
     server_table, cfttcp_table, cftprot_table, cftssl_table,
     partner_table, flow_table, processing_table,
     bosco_route_table, copilot_activity_table, migration_table,
 )
-from services.cft_config_parser import parse_cft_blocks, extract_server_info
-from services.exit_script_parser import classify_exit_script
-from services.bosco_config_parser import parse_bosco_config
-from services.copilot_activity_parser import parse_copilot_csv
-from services.database_operations import (
+from inventory.services.cft_config_parser import parse_cft_blocks, extract_server_info
+from inventory.services.exit_script_parser import classify_exit_script
+from inventory.services.bosco_config_parser import parse_bosco_config
+from inventory.services.copilot_activity_parser import parse_copilot_csv
+from inventory.services.database_operations import (
     create_schema, drop_schema,
     upsert_server, insert_cfttcp, insert_partner, insert_flow,
     expand_partner_list, insert_processing, insert_bosco_route,

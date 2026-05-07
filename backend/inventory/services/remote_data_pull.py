@@ -1,5 +1,5 @@
 import getpass
-import logging
+from inventory.services import logging
 import os
 import shutil
 import stat

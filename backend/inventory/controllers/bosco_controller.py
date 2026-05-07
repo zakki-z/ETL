@@ -12,9 +12,9 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.engine import Connection
 from sqlalchemy import select
 
-from db.database import get_db
-from models.bosco_route import bosco_route_table
-from schemas import BoscoRouteResponse
+from commons.db.database import get_db
+from inventory.models.bosco_route import bosco_route_table
+from inventory.schemas import BoscoRouteResponse
 
 router = APIRouter(prefix="/api/v1", tags=["Bosco Routes"])
 

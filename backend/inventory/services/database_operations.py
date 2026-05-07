@@ -2,7 +2,7 @@
 Database operations — schema management and record insert/upsert helpers.
 """
 
-import logging
+from inventory.services import logging
 import json
 from typing import Optional
 from datetime import datetime
@@ -10,7 +10,7 @@ from datetime import datetime
 from sqlalchemy.engine import Engine
 
 # Import the SHARED metadata that has all tables registered
-from models import (
+from inventory.models import (
     metadata,
     server_table, cfttcp_table, cftprot_table, cftssl_table,
     partner_table, flow_table, processing_table,

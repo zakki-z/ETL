@@ -15,9 +15,9 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.engine import Connection
 from sqlalchemy import select, text
 
-from db.database import get_db, engine
-from models.remote_server import remote_server_table
-from schemas.remote_server import (
+from commons.db.database import get_db, engine
+from inventory.models.remote_server import remote_server_table
+from inventory.schemas.remote_server import (
     RemoteServerCreate,
     RemoteServerUpdate,
     RemoteServerResponse,
@@ -211,7 +211,7 @@ def pull_from_remote_server(
                    "Please provide it in the request.",
         )
 
-    from services.remote_data_pull import pull_data_via_ssh
+    from inventory.services.remote_data_pull import pull_data_via_ssh
 
     try:
         local_path = pull_data_via_ssh(
@@ -239,7 +239,7 @@ def pull_from_remote_server(
         extraction_summary = None
 
         if payload.run_extraction:
-            from services.extraction_orchestrator import run_extraction
+            from inventory.services.extraction_orchestrator import run_extraction
 
             # Use the app's own database engine URL
             db_url = payload.db_url or str(engine.url)

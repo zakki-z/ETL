@@ -6,17 +6,17 @@ Read-only endpoints for CFTTCP, CFTPROT, and CFTSSL records.
 
 from __future__ import annotations
 
-from typing import List, Optional
+from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.engine import Connection
 from sqlalchemy import select
 
-from db.database import get_db
-from models.cfttcp import cfttcp_table
-from models.cftprot import cftprot_table
-from models.cftssl import cftssl_table
-from schemas import CftTcpResponse, CftProtResponse, CftSslResponse
+from commons.db.database import get_db
+from inventory.models.cfttcp import cfttcp_table
+from inventory.models.cftprot import cftprot_table
+from inventory.models.cftssl import cftssl_table
+from inventory.schemas import CftTcpResponse, CftProtResponse, CftSslResponse
 
 router = APIRouter(prefix="/api/v1", tags=["Network Config"])
 

@@ -12,10 +12,10 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.engine import Connection
 from sqlalchemy import select
 
-from db.database import get_db
-from models.server import server_table
-from models.partner import partner_table
-from schemas import PartnerResponse
+from commons.db.database import get_db
+from inventory.models.server import server_table
+from inventory.models.partner import partner_table
+from inventory.schemas import PartnerResponse
 
 router = APIRouter(prefix="/api/v1", tags=["Partners"])
 
