@@ -5,7 +5,7 @@ Discovers server directories, parses CFT configs / exit scripts /
 Bosco routes / Copilot CSVs, and loads everything into the database.
 """
 
-from inventory.services import logging
+import logging
 import re
 from pathlib import Path
 

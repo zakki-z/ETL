@@ -13,7 +13,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from commons.db.database import engine
-from inventory.controllers import all_routers
+from inventory.routers import all_routers
 
 # Import models to ensure all tables are registered on the shared metadata
 from inventory.services.database_operations import create_schema

@@ -1,5 +1,6 @@
 import getpass
-from inventory.services import logging
+import logging
+from inventory.services import logging_config
 import os
 import shutil
 import stat

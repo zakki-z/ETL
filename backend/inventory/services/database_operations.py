@@ -2,10 +2,10 @@
 Database operations — schema management and record insert/upsert helpers.
 """
 
-from inventory.services import logging
 import json
-from typing import Optional
+import logging
 from datetime import datetime
+from typing import Optional
 
 from sqlalchemy.engine import Engine
 
